@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RecruitRyte - Professional Recruitment Platform",
+  title: "AutoHR - Professional HR Automation Platform",
   description: "Sign in or create your account to access our professional recruitment platform. Connect with top talent and opportunities.",
   keywords: "recruitment, jobs, hiring, talent, careers, sign in, sign up",
-  authors: [{ name: "RecruitRyte Team" }],
+  authors: [{ name: "AutoHR Team" }],
   viewport: "width=device-width, initial-scale=1",
 };
 

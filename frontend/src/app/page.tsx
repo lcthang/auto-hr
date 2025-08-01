@@ -11,7 +11,7 @@ export default function Home() {
             <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl">
               <span className="text-white text-lg font-bold">R</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">RecruitRyte</span>
+            <span className="text-xl font-bold text-gray-900">AutoHR</span>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -40,8 +40,7 @@ export default function Home() {
             Platform
           </h1>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Search, screen, and engage the right candidates with precision at scale. 
-            Experience modern recruitment tools inspired by RecruitRyte's innovative platform.
+            Search, screen, and engage the right candidates with precision at scale.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -176,7 +175,7 @@ export default function Home() {
             <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
               <span className="text-white text-sm font-bold">R</span>
             </div>
-            <span className="text-lg font-bold text-gray-900">RecruitRyte</span>
+            <span className="text-lg font-bold text-gray-900">AutoHR</span>
           </div>
           <p className="text-gray-600">
             Professional authentication system built with modern web technologies.
