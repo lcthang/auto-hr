@@ -1,0 +1,87 @@
+version: '3.3'
+
+services:
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api-gateway:3001
+    depends_on:
+      - api-gateway
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  # API Gateway (Nest.js)
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - LLM_SERVICE_URL=http://fastapi-llm:8000
+      - MONGODB_URI=mongodb://mongodb:27017
+    depends_on:
+      - fastapi-llm
+      - mongodb
+    volumes:
+      - ./api-gateway:/app
+      - /app/node_modules
+
+  # FastAPI LLM Service
+  fastapi-llm:
+    build:
+      context: ./fastapi-llm
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./fastapi-llm:/app
+
+  # LangChain Agent
+  langchain-agent:
+    build:
+      context: ./langchain-agent
+      dockerfile: Dockerfile
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MONGODB_URI=mongodb://mongodb:27017
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./langchain-agent:/app
+
+  # MongoDB
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=auto_hr
+    volumes:
+      - mongodb_data:/data/db
+
+  # Lark Bot SDK (optional - can run separately)
+  lark-bot:
+    build:
+      context: ./lark-bot-sdk
+      dockerfile: Dockerfile
+    environment:
+      - LARK_APP_ID=${LARK_APP_ID}
+      - LARK_APP_SECRET=${LARK_APP_SECRET}
+      - LARK_VERIFICATION_TOKEN=${LARK_VERIFICATION_TOKEN}
+      - LARK_ENCRYPT_KEY=${LARK_ENCRYPT_KEY}
+    volumes:
+      - ./lark-bot-sdk:/app
+
+volumes:
+  mongodb_data: 
