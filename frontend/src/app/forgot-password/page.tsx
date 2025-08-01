@@ -50,14 +50,14 @@ export default function ForgotPassword() {
               <CheckCircleIcon className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h1>
-            <p className="text-gray-600">We've sent password reset instructions to</p>
+                          <p className="text-gray-600">We&apos;ve sent password reset instructions to</p>
             <p className="text-gray-900 font-medium">{email}</p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
             <div className="text-center space-y-4">
               <p className="text-gray-600">
-                Didn't receive the email? Check your spam folder or try again with a different email address.
+                Didn&apos;t receive the email? Check your spam folder or try again with a different email address.
               </p>
               
               <div className="space-y-3">
@@ -94,7 +94,7 @@ export default function ForgotPassword() {
             <span className="text-white text-2xl font-bold">R</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Forgot your password?</h1>
-          <p className="text-gray-600">No worries! Enter your email and we'll send you reset instructions.</p>
+                      <p className="text-gray-600">No worries! Enter your email and we&apos;ll send you reset instructions.</p>
         </div>
 
         {/* Reset Form */}
