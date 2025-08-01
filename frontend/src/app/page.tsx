@@ -22,10 +22,10 @@ export default function Home() {
               Sign in
             </Link>
             <Link
-              href="/auth/signup"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+              href="/signup"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
             >
-              Get started
+              Start Free Trial
             </Link>
           </div>
         </div>
@@ -35,22 +35,22 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Professional
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Authentication </span>
-            System
+            AI Recruitment
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> Sourcing </span>
+            Platform
           </h1>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Experience a modern, secure, and user-friendly authentication system inspired by top recruitment platforms like Recruitryte. 
-            Built with Next.js, TypeScript, and Tailwind CSS.
+            Search, screen, and engage the right candidates with precision at scale. 
+            Experience modern recruitment tools inspired by RecruitRyte's innovative platform.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                          <Link
+              href="/signup"
+              className="inline-flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <UserPlusIcon className="h-5 w-5 mr-2" />
-              Create Account
+              Start Your Free Trial
               <ArrowRightIcon className="h-5 w-5 ml-2" />
             </Link>
             <Link
