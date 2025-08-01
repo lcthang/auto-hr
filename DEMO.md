@@ -1,5 +1,3 @@
-# RecruitRyte-Style Signup Page Demo
-
 ## 🚀 Quick Start
 
 1. **Start the development server:**
@@ -32,7 +30,6 @@ The signup page features:
 #### **Visual Design**
 - Clean white form card with subtle shadow
 - Blue-to-indigo gradient background
-- Professional RecruitRyte branding with "R" logo
 - Responsive design that works on all devices
 
 #### **Form Fields**
@@ -105,7 +102,7 @@ Try these scenarios to see the validation in action:
 ## 🔗 Navigation
 
 - **Homepage**: `http://localhost:3000`
-- **New Signup**: `http://localhost:3000/signup` (RecruitRyte-style)
+- **New Signup**: `http://localhost:3000/signup`
 - **Original Signup**: `http://localhost:3000/auth/signup` (Multi-step)
 - **Sign In**: `http://localhost:3000/auth/signin`
 
@@ -144,4 +141,4 @@ Try these scenarios to see the validation in action:
 
 ---
 
-**Enjoy exploring the RecruitRyte-style signup page!** 🎉
+**Enjoy exploring the signup page!** 🎉

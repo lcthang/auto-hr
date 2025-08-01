@@ -1,10 +1,10 @@
-# RecruitRyte-Style Signup Page
+# Signup Page
 
-A modern, professional signup page inspired by RecruitRyte's clean and user-friendly design. Built with Next.js 15, TypeScript, and Tailwind CSS.
+A modern, professional signup page with clean and user-friendly design. Built with Next.js 15, TypeScript, and Tailwind CSS.
 
 ## ✨ Features
 
-- **Clean, Modern Design**: Inspired by RecruitRyte's actual signup page
+- **Clean, Modern Design**
 - **Single-Page Form**: Streamlined user experience with all fields on one page
 - **Form Validation**: Real-time validation with helpful error messages
 - **Password Visibility Toggle**: Enhanced UX with show/hide password functionality
@@ -134,7 +134,7 @@ frontend/
 ├── src/
 │   ├── app/
 │   │   ├── auth/           # Original auth pages
-│   │   ├── signup/         # New RecruitRyte-style signup
+│   │   ├── signup/         # Signup page
 │   │   ├── globals.css     # Global styles
 │   │   ├── layout.tsx      # Root layout
 │   │   └── page.tsx        # Homepage
@@ -171,7 +171,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Inspired by [RecruitRyte](https://app.recruitryte.com/signup) - AI Recruitment Sourcing Platform
 - Built with [Next.js](https://nextjs.org/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
 - Icons from [Heroicons](https://heroicons.com/)
@@ -181,5 +180,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions or feedback, please open an issue in the repository.
 
 ---
-
-**Note**: This is a demonstration project inspired by RecruitRyte's design. It is not affiliated with or endorsed by RecruitRyte.
