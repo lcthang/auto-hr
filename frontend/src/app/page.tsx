@@ -22,7 +22,7 @@ export default function Home() {
               Login
             </Link>
             <Link
-              href="/signup"
+              href="/register"
               className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
             >
               Start Free Trial
@@ -45,7 +45,7 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                           <Link
-              href="/signup"
+              href="/register"
               className="inline-flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <UserPlusIcon className="h-5 w-5 mr-2" />
@@ -159,7 +159,7 @@ export default function Home() {
             Try our sign-up flow and see how smooth and professional authentication can be.
           </p>
           <Link
-            href="/auth/signup"
+            href="/register"
             className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-xl font-medium hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             Get Started Now
