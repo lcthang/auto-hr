@@ -17,7 +17,11 @@ export const metadata: Metadata = {
   description: "Sign in or create your account to access our professional recruitment platform. Connect with top talent and opportunities.",
   keywords: "recruitment, jobs, hiring, talent, careers, sign in, sign up",
   authors: [{ name: "AutoHR Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({

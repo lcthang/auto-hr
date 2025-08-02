@@ -66,8 +66,8 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
-            <span className="text-white text-2xl font-bold">AutoHR</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
+            <span className="text-white text-2xl font-bold">R</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome!</h1>
         </div>
