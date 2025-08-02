@@ -4,4 +4,4 @@ export class ResumeUploadDto {
   @IsOptional()
   @IsString()
   description?: string;
-} 
+}

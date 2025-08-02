@@ -9,4 +9,4 @@ import { ResumesService } from './resumes.service';
   providers: [ResumesService],
   exports: [ResumesService],
 })
-export class ResumesModule {} 
+export class ResumesModule {}

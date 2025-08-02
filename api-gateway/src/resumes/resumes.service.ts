@@ -99,14 +99,15 @@ export class ResumesService {
     }
 
     // Basic phone extraction
-    const phoneRegex = /(\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
+    const phoneRegex =
+      /(\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
     const phones = content.match(phoneRegex);
     if (phones && phones.length > 0) {
       metadata.phone = phones[0];
     }
 
     // Basic name extraction (first line that looks like a name)
-    const lines = content.split('\n').filter(line => line.trim().length > 0);
+    const lines = content.split('\n').filter((line) => line.trim().length > 0);
     if (lines.length > 0) {
       const firstLine = lines[0].trim();
       if (firstLine.length > 2 && firstLine.length < 50) {
@@ -144,7 +145,7 @@ export class ResumesService {
     } catch (error) {
       this.logger.error('Failed to store in Vector DB', error);
       // Don't throw error for vector storage failure, just log it
-      return "";
+      return '';
     }
   }
 
