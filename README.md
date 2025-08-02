@@ -1,6 +1,6 @@
-# Signup Page
+# Register Page
 
-A modern, professional signup page with clean and user-friendly design. Built with Next.js 15, TypeScript, and Tailwind CSS.
+A modern, professional register page with clean and user-friendly design. Built with Next.js 15, TypeScript, and Tailwind CSS.
 
 ## ✨ Features
 
@@ -65,16 +65,16 @@ http://localhost:3000
 - Navigation with sign in/up links
 - Professional design showcasing the platform
 
-### Signup Page (`/signup`)
-- Clean, single-page signup form
+### Register Page (`/register`)
+- Clean, single-page register form
 - Fields: Name, Email, Company, Job Title, Password
 - Social login options (Google, Microsoft)
 - Terms of service and newsletter subscription options
 
 ### Existing Auth Pages
-- Multi-step signup at `/auth/signup` (original implementation)
-- Sign in page at `/auth/signin`
-- Forgot password at `/auth/forgot-password`
+- Multi-step register at `/register` (original implementation)
+- Sign in page at `/signin`
+- Forgot password at `/forgot-password`
 
 ## 🛠️ Technology Stack
 
@@ -87,7 +87,7 @@ http://localhost:3000
 
 ## 🎯 Form Fields
 
-The signup form includes the following fields:
+The register form includes the following fields:
 
 1. **Full Name** - Required
 2. **Email** - Required with email validation
@@ -134,7 +134,7 @@ frontend/
 ├── src/
 │   ├── app/
 │   │   ├── auth/           # Original auth pages
-│   │   ├── signup/         # Signup page
+│   │   ├── register/       # Register page
 │   │   ├── globals.css     # Global styles
 │   │   ├── layout.tsx      # Root layout
 │   │   └── page.tsx        # Homepage

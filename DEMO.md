@@ -20,12 +20,12 @@
   - Hero section showcasing the AI Recruitment Sourcing Platform
   - Professional blue-to-indigo gradient design
 
-### Step 2: Navigate to Signup
+### Step 2: Navigate to Register
 - Click "Start Free Trial" in the navigation or hero section
-- You'll be redirected to `/signup`
+- You'll be redirected to `/register`
 
-### Step 3: Signup Form
-The signup page features:
+### Step 3: Register Form
+The register page features:
 
 #### **Visual Design**
 - Clean white form card with subtle shadow
@@ -102,8 +102,7 @@ Try these scenarios to see the validation in action:
 ## 🔗 Navigation
 
 - **Homepage**: `http://localhost:3000`
-- **New Signup**: `http://localhost:3000/signup`
-- **Original Signup**: `http://localhost:3000/auth/signup` (Multi-step)
+- **New Register**: `http://localhost:3000/register`
 - **Sign In**: `http://localhost:3000/auth/signin`
 
 ## 📋 Testing Checklist
@@ -140,5 +139,3 @@ Try these scenarios to see the validation in action:
 - Implement dark mode support
 
 ---
-
-**Enjoy exploring the signup page!** 🎉

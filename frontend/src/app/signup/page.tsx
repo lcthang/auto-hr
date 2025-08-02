@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/react/24/outline';
 
-export default function SignUp() {
+export default function Register() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
