@@ -2,83 +2,94 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ForgotPassword() {
+  const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
-      setError('Email is required');
-      return;
-    }
+    if (!validateForm()) return;
     
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    
-    setError('');
     setIsLoading(true);
+    setErrors({});
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Password reset request for:', email);
+    try {
+      const { data, error } = await resetPassword(email);
+      
+      if (error) {
+        setErrors({ general: error.message });
+      } else {
+        setIsSuccess(true);
+      }
+    } catch (error: any) {
+      setErrors({ general: 'An unexpected error occurred' });
+    } finally {
       setIsLoading(false);
-      setIsSubmitted(true);
-    }, 1500);
-  };
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    if (error) {
-      setError('');
     }
   };
 
-  if (isSubmitted) {
+  if (isSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl mb-4">
-              <CheckCircleIcon className="h-8 w-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl mb-4">
+              <EnvelopeIcon className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h1>
-                          <p className="text-gray-600">We&apos;ve sent password reset instructions to</p>
-            <p className="text-gray-900 font-medium">{email}</p>
+            <p className="text-gray-600">
+              We've sent a password reset link to <strong>{email}</strong>
+            </p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
             <div className="text-center space-y-4">
-              <p className="text-gray-600">
-                Didn&apos;t receive the email? Check your spam folder or try again with a different email address.
-              </p>
+              <div className="bg-green-50 rounded-lg p-4">
+                <p className="text-sm text-green-800">
+                  If an account with that email exists, you'll receive a password reset link shortly.
+                </p>
+              </div>
               
-              <div className="space-y-3">
+              <div className="text-sm text-gray-600">
+                <p>Didn't receive the email? Check your spam folder or</p>
                 <button
-                  onClick={() => {
-                    setIsSubmitted(false);
-                    setEmail('');
-                  }}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200"
+                  onClick={() => setIsSuccess(false)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  Try another email
+                  try again
                 </button>
-                
-                <Link
-                  href="/auth/signin"
-                  className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-xl font-medium hover:bg-gray-200 transition-colors duration-200 block text-center"
-                >
-                  Back to sign in
-                </Link>
               </div>
             </div>
+          </div>
+
+          <div className="text-center mt-6">
+            <Link 
+              href="/login" 
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              Back to login
+            </Link>
           </div>
         </div>
       </div>
@@ -93,12 +104,20 @@ export default function ForgotPassword() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
             <span className="text-white text-2xl font-bold">R</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Forgot your password?</h1>
-                      <p className="text-gray-600">No worries! Enter your email and we&apos;ll send you reset instructions.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Reset your password</h1>
+          <p className="text-gray-600">
+            Enter your email address and we'll send you a link to reset your password.
+          </p>
         </div>
 
-        {/* Reset Form */}
+        {/* Reset Password Form */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+          {errors.general && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{errors.general}</p>
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
@@ -108,15 +127,21 @@ export default function ForgotPassword() {
               <input
                 type="email"
                 id="email"
+                name="email"
                 value={email}
-                onChange={handleEmailChange}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) {
+                    setErrors(prev => ({ ...prev, email: '' }));
+                  }
+                }}
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                  error ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                  errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                 }`}
-                placeholder="Enter your email address"
+                placeholder="Enter your email"
               />
-              {error && (
-                <p className="mt-1 text-sm text-red-600">{error}</p>
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
               )}
             </div>
 
@@ -129,23 +154,23 @@ export default function ForgotPassword() {
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Sending instructions...
+                  Sending reset link...
                 </div>
               ) : (
-                'Send reset instructions'
+                'Send reset link'
               )}
             </button>
           </form>
         </div>
 
-        {/* Back to Sign In */}
+        {/* Back to Login Link */}
         <div className="text-center mt-6">
           <Link 
-            href="/auth/signin" 
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            href="/login" 
+            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-2" />
-            Back to sign in
+            Back to login
           </Link>
         </div>
       </div>
