@@ -8,11 +8,11 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  signUp: (email: string, password: string, userData?: any) => Promise<any>
-  signIn: (email: string, password: string) => Promise<any>
+  signUp: (email: string, password: string, userData?: Record<string, unknown>) => Promise<{ data: unknown; error: Error | null }>
+  signIn: (email: string, password: string) => Promise<{ data: unknown; error: Error | null }>
   signOut: () => Promise<void>
-  resetPassword: (email: string) => Promise<any>
-  signInWithProvider: (provider: 'google' | 'microsoft') => Promise<any>
+  resetPassword: (email: string) => Promise<{ data: unknown; error: Error | null }>
+  signInWithProvider: (provider: 'google' | 'microsoft') => Promise<{ data: unknown; error: Error | null }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (email: string, password: string, userData?: any) => {
+  const signUp = async (email: string, password: string, userData?: Record<string, unknown>) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -71,8 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error
 
       return { data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
+    } catch (error: unknown) {
+      return { data: null, error: error as Error }
     }
   }
 
@@ -86,8 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error
 
       return { data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
+    } catch (error: unknown) {
+      return { data: null, error: error as Error }
     }
   }
 
@@ -109,8 +109,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error
 
       return { data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
+    } catch (error: unknown) {
+      return { data: null, error: error as Error }
     }
   }
 
@@ -126,8 +126,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error
 
       return { data, error: null }
-    } catch (error: any) {
-      return { data: null, error }
+    } catch (error: unknown) {
+      return { data: null, error: error as Error }
     }
   }
 
