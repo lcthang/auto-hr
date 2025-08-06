@@ -45,21 +45,6 @@ services:
     volumes:
       - ./fastapi-llm:/app
 
-  # LangChain Agent
-  langchain-agent:
-    build:
-      context: ./langchain-agent
-      dockerfile: Dockerfile
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - MONGODB_URI=mongodb://mongodb:27017
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-    depends_on:
-      - mongodb
-    volumes:
-      - ./langchain-agent:/app
-
   # MongoDB
   mongodb:
     image: mongo:6.0
@@ -69,19 +54,6 @@ services:
       - MONGO_INITDB_DATABASE=auto_hr
     volumes:
       - mongodb_data:/data/db
-
-  # Lark Bot SDK (optional - can run separately)
-  lark-bot:
-    build:
-      context: ./lark-bot-sdk
-      dockerfile: Dockerfile
-    environment:
-      - LARK_APP_ID=${LARK_APP_ID}
-      - LARK_APP_SECRET=${LARK_APP_SECRET}
-      - LARK_VERIFICATION_TOKEN=${LARK_VERIFICATION_TOKEN}
-      - LARK_ENCRYPT_KEY=${LARK_ENCRYPT_KEY}
-    volumes:
-      - ./lark-bot-sdk:/app
 
 volumes:
   mongodb_data: 
