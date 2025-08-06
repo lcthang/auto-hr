@@ -40,24 +40,18 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<LoginResponseDto> {
-    if (this.databaseConfigService.isMongoDB()) {
-      return this.registerMongoDB(registerDto);
+    if (this.databaseConfigService.isSupabase()) {
+      return this.registerSupabase(registerDto)
     } else {
-      if (!this.supabaseService) {
-        throw new Error('Supabase service is not available');
-      }
-      return this.registerSupabase(registerDto);
+      return this.registerMongoDB(registerDto);
     }
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-    if (this.databaseConfigService.isMongoDB()) {
-      return this.loginMongoDB(loginDto);
+    if (this.databaseConfigService.isSupabase()) {
+      return this.loginSupabase(loginDto)
     } else {
-      if (!this.supabaseService) {
-        throw new Error('Supabase service is not available');
-      }
-      return this.loginSupabase(loginDto);
+      return this.loginMongoDB(loginDto);
     }
   }
 
@@ -66,13 +60,13 @@ export class AuthService {
       const payload = this.jwtAuthService.verifyRefreshToken(refreshToken);
 
       let user;
-      if (this.databaseConfigService.isMongoDB()) {
-        user = await this.userModel.findById(payload.sub).exec();
-      } else {
+      if (this.databaseConfigService.isSupabase()) {
         if (!this.supabaseService) {
           throw new Error('Supabase service is not available');
         }
         user = await this.supabaseService.findUserById(payload.sub);
+      } else {
+        user = await this.userModel.findById(payload.sub).exec();
       }
 
       if (!user || !user.isActive) {
@@ -107,13 +101,13 @@ export class AuthService {
       const payload = this.jwtAuthService.verifyToken(token);
 
       let user;
-      if (this.databaseConfigService.isMongoDB()) {
-        user = await this.userModel.findById(payload.sub).exec();
-      } else {
+      if (this.databaseConfigService.isSupabase()) {
         if (!this.supabaseService) {
           throw new Error('Supabase service is not available');
         }
         user = await this.supabaseService.findUserById(payload.sub);
+      } else {
+        user = await this.userModel.findById(payload.sub).exec();
       }
 
       if (!user || !user.isActive) {
@@ -135,13 +129,13 @@ export class AuthService {
 
   async getProfile(userId: string): Promise<User> {
     let user;
-    if (this.databaseConfigService.isMongoDB()) {
-      user = await this.userModel.findById(userId).exec();
-    } else {
+    if (this.databaseConfigService.isSupabase()) {
       if (!this.supabaseService) {
         throw new Error('Supabase service is not available');
       }
       user = await this.supabaseService.findUserById(userId);
+    } else {
+      user = await this.userModel.findById(userId).exec();
     }
 
     if (!user) {
@@ -157,13 +151,13 @@ export class AuthService {
     newPassword: string,
   ): Promise<{ status: string; message: string }> {
     let user;
-    if (this.databaseConfigService.isMongoDB()) {
-      user = await this.userModel.findById(userId).exec();
-    } else {
+    if (this.databaseConfigService.isSupabase()) {
       if (!this.supabaseService) {
         throw new Error('Supabase service is not available');
       }
       user = await this.supabaseService.findUserById(userId);
+    } else {
+      user = await this.userModel.findById(userId).exec();
     }
 
     if (!user) {
@@ -175,14 +169,14 @@ export class AuthService {
       throw new BadRequestException('Current password is incorrect');
     }
 
-    if (this.databaseConfigService.isMongoDB()) {
-      user.password = newPassword;
-      await user.save();
-    } else {
+    if (this.databaseConfigService.isSupabase()) {
       if (!this.supabaseService) {
         throw new Error('Supabase service is not available');
       }
       await this.supabaseService.updateUser(userId, { password: newPassword });
+    } else {
+      user.password = newPassword;
+      await user.save();
     }
 
     return {
