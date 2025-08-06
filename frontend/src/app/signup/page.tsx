@@ -385,7 +385,7 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Sign In Link */}
+        {/* Login Link */}
         <div className="text-center mt-6">
           <p className="text-gray-600">
             Already have an account?{' '}
@@ -393,7 +393,7 @@ export default function Register() {
               href="/auth/signin" 
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
-              Sign in
+              Login
             </Link>
           </p>
         </div>

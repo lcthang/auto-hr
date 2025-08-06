@@ -57,7 +57,7 @@ export default function Home() {
               className="inline-flex items-center bg-white text-gray-700 px-8 py-4 rounded-xl font-medium hover:bg-gray-50 transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200"
             >
               <LockClosedIcon className="h-5 w-5 mr-2" />
-              Log In
+              Login
             </Link>
           </div>
         </div>

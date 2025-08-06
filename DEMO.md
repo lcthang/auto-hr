@@ -16,7 +16,7 @@
 ### Step 1: Homepage
 - Visit the homepage at `http://localhost:3000`
 - You'll see a modern landing page with:
-  - Clean navigation with "Sign in" and "Start Free Trial" buttons
+  - Clean navigation with "Login" and "Start Free Trial" buttons
   - Hero section showcasing the AI Recruitment Sourcing Platform
   - Professional blue-to-indigo gradient design
 
@@ -103,7 +103,6 @@ Try these scenarios to see the validation in action:
 
 - **Homepage**: `http://localhost:3000`
 - **New Register**: `http://localhost:3000/register`
-- **Sign In**: `http://localhost:3000/auth/signin`
 
 ## 📋 Testing Checklist
 

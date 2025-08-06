@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AutoHR - Professional HR Automation Platform",
-  description: "Sign in or create your account to access our professional recruitment platform. Connect with top talent and opportunities.",
-  keywords: "recruitment, jobs, hiring, talent, careers, sign in, sign up",
+  description: "Login or create your account to access our professional recruitment platform. Connect with top talent and opportunities.",
+  keywords: "recruitment, jobs, hiring, talent, careers, login, sign up",
   authors: [{ name: "AutoHR Team" }],
 };
 

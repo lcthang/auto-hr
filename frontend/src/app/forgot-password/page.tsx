@@ -75,7 +75,7 @@ export default function ForgotPassword() {
                   href="/auth/signin"
                   className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-xl font-medium hover:bg-gray-200 transition-colors duration-200 block text-center"
                 >
-                  Back to sign in
+                  Back to login
                 </Link>
               </div>
             </div>
@@ -138,14 +138,14 @@ export default function ForgotPassword() {
           </form>
         </div>
 
-        {/* Back to Sign In */}
+        {/* Back to Login */}
         <div className="text-center mt-6">
           <Link 
             href="/auth/signin" 
             className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-2" />
-            Back to sign in
+            Back to login
           </Link>
         </div>
       </div>

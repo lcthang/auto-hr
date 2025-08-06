@@ -62,7 +62,7 @@ http://localhost:3000
 
 ### Homepage (`/`)
 - Modern landing page with hero section
-- Navigation with sign in/up links
+- Navigation with login /sign up links
 - Professional design showcasing the platform
 
 ### Register Page (`/register`)
@@ -73,7 +73,7 @@ http://localhost:3000
 
 ### Existing Auth Pages
 - Multi-step register at `/register` (original implementation)
-- Sign in page at `/signin`
+- Login page at `/login`
 - Forgot password at `/forgot-password`
 
 ## 🛠️ Technology Stack

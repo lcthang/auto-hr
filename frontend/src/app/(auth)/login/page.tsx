@@ -55,7 +55,7 @@ export default function Login() {
     
     // Simulate API call
     setTimeout(() => {
-      console.log('Sign in attempt:', formData);
+      console.log('Login attempt:', formData);
       setIsLoading(false);
       // Here you would typically handle the actual authentication
     }, 1500);
@@ -72,7 +72,7 @@ export default function Login() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome!</h1>
         </div>
 
-        {/* Sign In Form */}
+        {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <h3 className="text-center text-2xl font-bold text-gray-900 mb-2">Login</h3>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -163,7 +163,7 @@ export default function Login() {
                   Signing in...
                 </div>
               ) : (
-                'Sign in'
+                'Login'
               )}
             </button>
           </form>
