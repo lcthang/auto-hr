@@ -5,15 +5,10 @@ import {
   BadRequestException,
   Optional,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
 import { JwtAuthService } from './jwt.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthResponseDto, LoginResponseDto } from './dto/auth-response.dto';
-import { ConfigService } from '@nestjs/config';
-import { DatabaseConfigService } from '../database/database.config';
 import { SupabaseService } from '../database/supabase.service';
 
 // Helper function to safely extract user ID
@@ -21,38 +16,19 @@ function extractUserId(user: any): string {
   return user.id || user._id || '';
 }
 
-// Helper function to safely get SupabaseService
-function getSupabaseService(service: SupabaseService | undefined): SupabaseService {
-  if (!service) {
-    throw new Error('Supabase service is not available');
-  }
-  return service;
-}
-
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly jwtAuthService: JwtAuthService,
-    private readonly configService: ConfigService,
-    private readonly databaseConfigService: DatabaseConfigService,
     @Optional() private readonly supabaseService?: SupabaseService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<LoginResponseDto> {
-    if (this.databaseConfigService.isSupabase()) {
-      return this.registerSupabase(registerDto)
-    } else {
-      return this.registerMongoDB(registerDto);
-    }
+    return this.registerSupabase(registerDto)
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-    if (this.databaseConfigService.isSupabase()) {
-      return this.loginSupabase(loginDto)
-    } else {
-      return this.loginMongoDB(loginDto);
-    }
+    return this.loginSupabase(loginDto)
   }
 
   async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
@@ -60,14 +36,10 @@ export class AuthService {
       const payload = this.jwtAuthService.verifyRefreshToken(refreshToken);
 
       let user;
-      if (this.databaseConfigService.isSupabase()) {
-        if (!this.supabaseService) {
-          throw new Error('Supabase service is not available');
-        }
-        user = await this.supabaseService.findUserById(payload.sub);
-      } else {
-        user = await this.userModel.findById(payload.sub).exec();
+      if (!this.supabaseService) {
+        throw new Error('Supabase service is not available');
       }
+      user = await this.supabaseService.findUserById(payload.sub);
 
       if (!user || !user.isActive) {
         throw new UnauthorizedException('Invalid refresh token');
@@ -96,19 +68,15 @@ export class AuthService {
     }
   }
 
-  async validateToken(token: string): Promise<User> {
+  async validateToken(token: string): Promise<any> {
     try {
       const payload = this.jwtAuthService.verifyToken(token);
 
       let user;
-      if (this.databaseConfigService.isSupabase()) {
-        if (!this.supabaseService) {
-          throw new Error('Supabase service is not available');
-        }
-        user = await this.supabaseService.findUserById(payload.sub);
-      } else {
-        user = await this.userModel.findById(payload.sub).exec();
+      if (!this.supabaseService) {
+        throw new Error('Supabase service is not available');
       }
+      user = await this.supabaseService.findUserById(payload.sub);
 
       if (!user || !user.isActive) {
         throw new UnauthorizedException('Invalid token');
@@ -127,16 +95,12 @@ export class AuthService {
     };
   }
 
-  async getProfile(userId: string): Promise<User> {
+  async getProfile(userId: string): Promise<any> {
     let user;
-    if (this.databaseConfigService.isSupabase()) {
-      if (!this.supabaseService) {
-        throw new Error('Supabase service is not available');
-      }
-      user = await this.supabaseService.findUserById(userId);
-    } else {
-      user = await this.userModel.findById(userId).exec();
+    if (!this.supabaseService) {
+      throw new Error('Supabase service is not available');
     }
+    user = await this.supabaseService.findUserById(userId);
 
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -151,14 +115,10 @@ export class AuthService {
     newPassword: string,
   ): Promise<{ status: string; message: string }> {
     let user;
-    if (this.databaseConfigService.isSupabase()) {
-      if (!this.supabaseService) {
-        throw new Error('Supabase service is not available');
-      }
-      user = await this.supabaseService.findUserById(userId);
-    } else {
-      user = await this.userModel.findById(userId).exec();
+    if (!this.supabaseService) {
+      throw new Error('Supabase service is not available');
     }
+    user = await this.supabaseService.findUserById(userId);
 
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -169,64 +129,15 @@ export class AuthService {
       throw new BadRequestException('Current password is incorrect');
     }
 
-    if (this.databaseConfigService.isSupabase()) {
-      if (!this.supabaseService) {
-        throw new Error('Supabase service is not available');
-      }
-      await this.supabaseService.updateUser(userId, { password: newPassword });
-    } else {
-      user.password = newPassword;
-      await user.save();
+    if (!this.supabaseService) {
+      throw new Error('Supabase service is not available');
     }
+    await this.supabaseService.updateUser(userId, { password: newPassword });
 
     return {
       status: 'success',
       message: 'Password changed successfully',
     };
-  }
-
-  // MongoDB specific methods
-  private async registerMongoDB(
-    registerDto: RegisterDto,
-  ): Promise<LoginResponseDto> {
-    const existingUser = await this.userModel
-      .findOne({ email: registerDto.email })
-      .exec();
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
-
-    const user = new this.userModel({
-      firstName: registerDto.firstName,
-      lastName: registerDto.lastName,
-      email: registerDto.email,
-      password: registerDto.password,
-      phoneNumber: registerDto.phoneNumber,
-    });
-
-    const savedUser = await user.save();
-    return this.createAuthResponse(savedUser, 'User registered successfully');
-  }
-
-  private async loginMongoDB(loginDto: LoginDto): Promise<LoginResponseDto> {
-    const user = await this.userModel
-      .findOne({ email: loginDto.email })
-      .select('+password')
-      .exec();
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    if (!user.isActive) {
-      throw new UnauthorizedException('Account is deactivated');
-    }
-
-    const isPasswordValid = await user.validatePassword(loginDto.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    return this.createAuthResponse(user, 'Login successful');
   }
 
   // Supabase specific methods
