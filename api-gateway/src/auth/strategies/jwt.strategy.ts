@@ -3,17 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthService, JwtPayload } from '../jwt.service';
-import { User } from '../entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { SupabaseService } from '../../database/supabase.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtAuthService: JwtAuthService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly supabaseService: SupabaseService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,10 +19,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: payload.sub },
-    });
+  async validate(payload: JwtPayload): Promise<any> {
+    const user = await this.supabaseService.findUserById(payload.sub);
 
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid token');

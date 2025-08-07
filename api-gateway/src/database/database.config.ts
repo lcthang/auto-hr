@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 export enum DatabaseType {
-  MONGODB = 'mongodb',
   SUPABASE = 'supabase',
+  MONGODB = 'mongodb', // For future use
 }
 
 @Injectable()
@@ -11,16 +11,16 @@ export class DatabaseConfigService {
   constructor(private configService: ConfigService) {}
 
   getDatabaseType(): DatabaseType {
-    const dbType = this.configService.get<string>('DATABASE_TYPE', 'mongodb');
+    const dbType = this.configService.get<string>('DATABASE_TYPE', 'supabase');
     return dbType as DatabaseType;
-  }
-
-  isMongoDB(): boolean {
-    return this.getDatabaseType() === DatabaseType.MONGODB;
   }
 
   isSupabase(): boolean {
     return this.getDatabaseType() === DatabaseType.SUPABASE;
+  }
+
+  isMongoDB(): boolean {
+    return this.getDatabaseType() === DatabaseType.MONGODB;
   }
 
   getMongoDBUri(): string {

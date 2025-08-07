@@ -36,7 +36,7 @@ export class ResumesService {
     // Extract metadata from content
     const metadata = await this.extractMetadata(content);
 
-    // Store in MongoDB
+    // Store resume data
     const resumeData: ProcessedResume = {
       id: this.generateId(),
       filename: file.originalname,
@@ -45,7 +45,8 @@ export class ResumesService {
       createdAt: new Date(),
     };
 
-    await this.storeInMongoDB(resumeData);
+    // Note: MongoDB storage will be implemented later for resume data
+    // await this.storeInMongoDB(resumeData);
 
     // Store embeddings in Supabase Vector DB
     const vectorId = await this.storeInVectorDB(resumeData);
@@ -118,17 +119,18 @@ export class ResumesService {
     return metadata;
   }
 
-  private async storeInMongoDB(resumeData: ProcessedResume): Promise<void> {
-    try {
-      // Call MongoDB service to store resume data
-      await firstValueFrom(
-        this.httpService.post('http://localhost:8000/store-resume', resumeData),
-      );
-    } catch (error) {
-      this.logger.error('Failed to store in MongoDB', error);
-      throw new Error('Failed to store resume in database');
-    }
-  }
+  // MongoDB storage will be implemented later for resume data
+  // private async storeInMongoDB(resumeData: ProcessedResume): Promise<void> {
+  //   try {
+  //     // Call MongoDB service to store resume data
+  //     await firstValueFrom(
+  //       this.httpService.post('http://localhost:8000/store-resume', resumeData),
+  //   );
+  //   } catch (error) {
+  //     this.logger.error('Failed to store in MongoDB', error);
+  //     throw new Error('Failed to store resume in database');
+  //   }
+  // }
 
   private async storeInVectorDB(resumeData: ProcessedResume): Promise<string> {
     try {

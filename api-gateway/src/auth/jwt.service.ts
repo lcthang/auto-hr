@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { User } from './entities/user.entity';
 
 export interface JwtPayload {
   sub: string;
@@ -18,7 +17,7 @@ export class JwtAuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateAccessToken(user: User): string {
+  generateAccessToken(user: any): string {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -31,7 +30,7 @@ export class JwtAuthService {
     });
   }
 
-  generateRefreshToken(user: User): string {
+  generateRefreshToken(user: any): string {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,

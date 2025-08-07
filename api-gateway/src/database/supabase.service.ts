@@ -1,28 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class SupabaseService {
-  private supabase: SupabaseClient;
+  private supabase: SupabaseClient | null = null;
+  private readonly logger = new Logger(SupabaseService.name);
 
   constructor(private configService: ConfigService) {
+    this.initializeSupabase();
+  }
+
+  private initializeSupabase(): void {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     const supabaseKey = this.configService.get<string>('SUPABASE_ANON_KEY');
 
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase URL and Anon Key are required');
+      this.logger.warn('Supabase URL and Anon Key are not configured. Supabase features will be disabled.');
+      return;
     }
 
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    try {
+      this.supabase = createClient(supabaseUrl, supabaseKey);
+      this.logger.log('Supabase client initialized successfully');
+    } catch (error) {
+      this.logger.error('Failed to initialize Supabase client', error);
+    }
   }
 
-  getClient(): SupabaseClient {
+  getClient(): SupabaseClient | null {
     return this.supabase;
   }
 
   // User operations
   async createUser(userData: any) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
     const { data, error } = await this.supabase
       .from('users')
       .insert([userData])
@@ -34,6 +49,10 @@ export class SupabaseService {
   }
 
   async findUserByEmail(email: string) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
     const { data, error } = await this.supabase
       .from('users')
       .select('*')
@@ -45,6 +64,10 @@ export class SupabaseService {
   }
 
   async findUserById(id: string) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
     const { data, error } = await this.supabase
       .from('users')
       .select('*')
@@ -56,6 +79,10 @@ export class SupabaseService {
   }
 
   async updateUser(id: string, updates: any) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
     const { data, error } = await this.supabase
       .from('users')
       .update(updates)
@@ -68,6 +95,10 @@ export class SupabaseService {
   }
 
   async deleteUser(id: string) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
     const { error } = await this.supabase.from('users').delete().eq('id', id);
 
     if (error) throw error;
