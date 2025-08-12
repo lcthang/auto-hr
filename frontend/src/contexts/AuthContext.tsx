@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
+  error: string | null
   signUp: (email: string, password: string, userData?: Record<string, unknown>) => Promise<{ data: unknown; error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ data: unknown; error: Error | null }>
   signOut: () => Promise<void>
@@ -29,18 +30,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Check if Supabase is properly configured
+    const checkSupabaseConfig = () => {
+      try {
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        
+        if (!url || !key) {
+          const errorMsg = 'Supabase configuration is missing. Please check your environment variables.'
+          console.error(errorMsg)
+          setError(errorMsg)
+          setLoading(false)
+          return false
+        }
+        return true
+      } catch (err) {
+        const errorMsg = 'Failed to check Supabase configuration'
+        console.error(errorMsg, err)
+        setError(errorMsg)
+        setLoading(false)
+        return false
+      }
+    }
+
     // Get initial session
     const getSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession()
-      if (error) {
-        console.error('Error getting session:', error)
-      } else {
-        setSession(session)
-        setUser(session?.user ?? null)
+      try {
+        if (!checkSupabaseConfig()) return
+        
+        console.log('Getting initial session...')
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error('Error getting session:', error)
+          setError(`Session error: ${error.message}`)
+        } else {
+          console.log('Initial session:', session ? 'exists' : 'none', session?.user?.email)
+          setSession(session)
+          setUser(session?.user ?? null)
+        }
+      } catch (error) {
+        console.error('Unexpected error getting session:', error)
+        setError('Failed to get initial session')
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     getSession()
@@ -48,10 +84,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email)
+        console.log('Auth state changed:', event, session?.user?.email, 'User:', session?.user ? 'exists' : 'none')
         setSession(session)
         setUser(session?.user ?? null)
         setLoading(false)
+        setError(null) // Clear any previous errors
       }
     )
 
@@ -121,15 +158,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('Attempting sign in for:', email)
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Sign in error:', error)
+        throw error
+      }
+
+      console.log('Sign in successful:', data.user?.email)
+      console.log('Session data:', data.session ? 'exists' : 'none')
+      
+      // Immediately update local state
+      if (data.session) {
+        setSession(data.session)
+        setUser(data.user)
+      }
 
       return { data, error: null }
     } catch (error: unknown) {
+      console.error('Sign in failed:', error)
       return { data: null, error: error as Error }
     }
   }
@@ -138,6 +189,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      
+      // Clear local state immediately
+      setSession(null)
+      setUser(null)
     } catch (error) {
       console.error('Error signing out:', error)
     }
@@ -178,6 +233,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    error,
     signUp,
     signIn,
     signOut,

@@ -7,7 +7,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Login() {
-  const { signIn, signInWithProvider, user, loading } = useAuth();
+  const { signIn, signInWithProvider, user, loading, error: authError } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -20,7 +20,9 @@ export default function Login() {
 
   // Redirect if already authenticated
   useEffect(() => {
+    console.log('Login page useEffect - loading:', loading, 'user:', user ? 'exists' : 'none')
     if (!loading && user) {
+      console.log('User is authenticated, redirecting to dashboard...')
       router.push('/dashboard');
     }
   }, [user, loading, router]);
@@ -66,22 +68,25 @@ export default function Login() {
     setErrors({});
     
     try {
+      console.log('Submitting login form...')
       const { data, error } = await signIn(formData.email, formData.password);
       
       if (error) {
+        console.error('Login error:', error)
         setErrors({ general: error.message });
-      } else if (
-        data &&
-        typeof data === 'object' &&
-        'user' in data &&
-        data.user &&
-        typeof data.user === 'object' &&
-        'email' in (data.user as Record<string, unknown>)
-      ) {
-        // Success - redirect will happen via useEffect
-        console.log('Login successful:', (data.user as { email?: string }).email);
+      } else if (data) {
+        console.log('Login successful, checking user state...')
+        // The redirect should happen via useEffect when user state updates
+        // But let's also try to redirect manually if needed
+        setTimeout(() => {
+          if (user) {
+            console.log('Manual redirect to dashboard...')
+            router.push('/dashboard');
+          }
+        }, 100);
       }
     } catch (error: any) {
+      console.error('Unexpected login error:', error)
       setErrors({ general: 'An unexpected error occurred' });
     } finally {
       setIsLoading(false);
@@ -101,6 +106,61 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show configuration error if Supabase is not properly configured
+  if (authError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-xl border border-red-200 p-8">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-2xl mb-4">
+                <span className="text-red-600 text-2xl">⚠️</span>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">Configuration Error</h1>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-red-600">{authError}</p>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Please check the <code className="bg-gray-100 px-2 py-1 rounded">SUPABASE_SETUP.md</code> file 
+                for instructions on how to configure your environment variables.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is already authenticated, show loading while redirecting
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -257,15 +317,15 @@ export default function Login() {
 
         {/* Sign Up Link */}
         <div className="text-center mt-6">
-                      <p className="text-gray-600">
-              Don&apos;t have an account?{' '}
-              <Link 
-                href="/register" 
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-              >
-                Sign up for free
-              </Link>
-            </p>
+          <p className="text-gray-600">
+            Don&apos;t have an account?{' '}
+            <Link 
+              href="/register" 
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              Sign up for free
+            </Link>
+          </p>
         </div>
       </div>
     </div>
