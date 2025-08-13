@@ -3,30 +3,12 @@ import {
   IsString,
   MinLength,
   MaxLength,
-  Matches,
+  IsBoolean,
   IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
-  @ApiProperty({
-    description: 'User first name',
-    example: 'John',
-  })
-  @IsString({ message: 'First name must be a string' })
-  @MinLength(2, { message: 'First name must be at least 2 characters long' })
-  @MaxLength(50, { message: 'First name must not exceed 50 characters' })
-  firstName: string;
-
-  @ApiProperty({
-    description: 'User last name',
-    example: 'Doe',
-  })
-  @IsString({ message: 'Last name must be a string' })
-  @MinLength(2, { message: 'Last name must be at least 2 characters long' })
-  @MaxLength(50, { message: 'Last name must not exceed 50 characters' })
-  lastName: string;
-
   @ApiProperty({
     description: 'User email address',
     example: 'john.doe@example.com',
@@ -35,28 +17,58 @@ export class RegisterDto {
   email: string;
 
   @ApiProperty({
-    description: 'User password',
-    example: 'SecurePass123!',
-    minLength: 8,
+    description: 'User first name',
+    example: 'John',
   })
-  @IsString({ message: 'Password must be a string' })
-  @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  @MaxLength(128, { message: 'Password must not exceed 128 characters' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message:
-      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-  })
-  password: string;
+  @IsString({ message: 'First name must be a string' })
+  @MinLength(2, { message: 'First name must be at least 2 characters long' })
+  @MaxLength(50, { message: 'First name must not exceed 50 characters' })
+  first_name: string;
 
   @ApiProperty({
-    description: 'User phone number (optional)',
-    example: '+1234567890',
-    required: false,
+    description: 'User last name',
+    example: 'Doe',
+  })
+  @IsString({ message: 'Last name must be a string' })
+  @MinLength(2, { message: 'Last name must be at least 2 characters long' })
+  @MaxLength(50, { message: 'Last name must not exceed 50 characters' })
+  last_name: string;
+
+  @ApiProperty({
+    description: 'User company',
+    example: 'Acme Corp',
+    required: false
   })
   @IsOptional()
-  @IsString({ message: 'Phone number must be a string' })
-  @Matches(/^\+?[1-9]\d{1,14}$/, {
-    message: 'Please provide a valid phone number',
+  @IsString()
+  company?: string;
+
+  @ApiProperty({
+    description: 'User job title',
+    example: 'Software Engineer',
+    required: false
   })
-  phoneNumber?: string;
+  @IsOptional()
+  @IsString()
+  job_title?: string;
+
+  @ApiProperty({
+    description: 'Newsletter subscription preference',
+    example: true,
+    required: false,
+    default: false
+  })
+  @IsOptional()
+  @IsBoolean()
+  subscribe_newsletter?: boolean;
+
+  @ApiProperty({
+    description: 'User active status',
+    example: true,
+    required: false,
+    default: true
+  })
+  @IsOptional()
+  @IsBoolean()
+  is_active?: boolean;
 }

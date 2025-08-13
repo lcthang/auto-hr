@@ -23,7 +23,7 @@ export class AuthService {
     @Optional() private readonly supabaseService?: SupabaseService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<LoginResponseDto> {
+  async register(registerDto: RegisterDto): Promise<any> {
     return this.registerSupabase(registerDto)
   }
 
@@ -141,28 +141,19 @@ export class AuthService {
   }
 
   // Supabase specific methods
-  private async registerSupabase(
-    registerDto: RegisterDto,
-  ): Promise<LoginResponseDto> {
+  private async registerSupabase(registerDto: RegisterDto): Promise<any> {
     if (!this.supabaseService) {
       throw new Error('Supabase service is not available');
     }
-    const existingUser = await this.supabaseService.findUserByEmail(
-      registerDto.email,
-    );
+
+    // Check if user profile already exists
+    const existingUser = await this.supabaseService.findUserByEmail(registerDto.email);
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
-    const userData = {
-      firstName: registerDto.firstName,
-      lastName: registerDto.lastName,
-      email: registerDto.email,
-      password: registerDto.password, // Will be hashed by Supabase auth
-      phoneNumber: registerDto.phoneNumber,
-    };
-
-    const savedUser = await this.supabaseService!.createUser(userData);
+    // Create the user profile using the service role key (bypasses RLS)
+    const savedUser = await this.supabaseService!.createUser(registerDto);
     return this.createAuthResponse(savedUser, 'User registered successfully');
   }
 

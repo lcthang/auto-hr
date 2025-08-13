@@ -33,8 +33,4 @@ export class DatabaseConfigService {
   getSupabaseUrl(): string {
     return this.configService.get<string>('SUPABASE_URL', '');
   }
-
-  getSupabaseKey(): string {
-    return this.configService.get<string>('SUPABASE_ANON_KEY', '');
-  }
 }

@@ -43,20 +43,21 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
   @ApiBody({ type: RegisterDto })
   @ApiResponse({
     status: 201,
     description: 'User registered successfully',
-    type: LoginResponseDto,
+    type: RegisterDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error or missing required fields'
   })
   @ApiResponse({
     status: 409,
     description: 'User with this email already exists',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Validation error',
   })
   async register(@Body() registerDto: RegisterDto): Promise<LoginResponseDto> {
     return this.authService.register(registerDto);
