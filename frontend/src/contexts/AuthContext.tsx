@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { apiService, CreateProfileData } from '@/lib/api'
 
 interface AuthContextType {
   user: User | null
@@ -38,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const url = process.env.NEXT_PUBLIC_SUPABASE_URL
         const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        
+
         if (!url || !key) {
           const errorMsg = 'Supabase configuration is missing. Please check your environment variables.'
           console.error(errorMsg)
@@ -68,6 +69,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setError(`Session error: ${error.message}`)
         } else {
           console.log('Initial session:', session ? 'exists' : 'none', session?.user?.email)
+          console.log('Session data:', session)
+          console.log('User data:', session?.user)
           setSession(session)
           setUser(session?.user ?? null)
         }
@@ -95,34 +98,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe()
   }, [])
 
-  const createUserProfile = async (user: User, userData: Record<string, unknown>) => {
+  const registerUser = async (user: User, userData: Record<string, unknown>) => {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .insert([
-          {
-            id: user.id,
-            email: user.email,
-            first_name: userData.first_name || '',
-            last_name: userData.last_name || '',
-            company: userData.company || '',
-            job_title: userData.job_title || '',
-            subscribe_newsletter: userData.subscribe_newsletter || false,
-            is_active: true
-          }
-        ])
-        .select()
-        .single()
+      // Use API gateway instead of direct Supabase insertion
+      const profileData: CreateProfileData = {
+        id: user.id,
+        email: user.email || '',
+        first_name: (userData.first_name as string) || '',
+        last_name: (userData.last_name as string) || '',
+        company: (userData.company as string) || '',
+        job_title: (userData.job_title as string) || '',
+        subscribe_newsletter: (userData.subscribe_newsletter as boolean) || false,
+        is_active: true
+      };
 
-      if (error) {
-        console.error('Error creating user profile:', error)
-        throw error
+      const response = await apiService.registerUser(profileData);
+
+      if (!response.success) {
+        console.error('Error creating user profile:', response.error);
+        throw new Error(response.error || 'Failed to create user profile');
       }
 
-      return data
+      return response.data;
     } catch (error) {
-      console.error('Error creating user profile:', error)
-      throw error
+      console.error('Error creating user profile:', error);
+      throw error;
     }
   }
 
@@ -141,7 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // If signup is successful and we have user data, create profile in database
       if (data.user && userData) {
         try {
-          await createUserProfile(data.user, userData)
+          await registerUser(data.user, userData)
           console.log('User profile created successfully in database')
         } catch (profileError) {
           console.error('Failed to create user profile:', profileError)
