@@ -23,7 +23,7 @@ export class RegisterDto {
   @IsString({ message: 'First name must be a string' })
   @MinLength(2, { message: 'First name must be at least 2 characters long' })
   @MaxLength(50, { message: 'First name must not exceed 50 characters' })
-  first_name: string;
+  first_name?: string;
 
   @ApiProperty({
     description: 'User last name',
@@ -32,7 +32,7 @@ export class RegisterDto {
   @IsString({ message: 'Last name must be a string' })
   @MinLength(2, { message: 'Last name must be at least 2 characters long' })
   @MaxLength(50, { message: 'Last name must not exceed 50 characters' })
-  last_name: string;
+  last_name?: string;
 
   @ApiProperty({
     description: 'User company',
