@@ -13,10 +13,10 @@ export class SupabaseService {
 
   private initializeSupabase(): void {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseKey = this.configService.get<string>('SUPABASE_ANON_KEY');
+    const supabaseKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!supabaseUrl || !supabaseKey) {
-      this.logger.warn('Supabase URL and Anon Key are not configured. Supabase features will be disabled.');
+      this.logger.warn('Supabase URL and Service Role Key are not configured. Supabase features will be disabled.');
       return;
     }
 
@@ -103,5 +103,70 @@ export class SupabaseService {
 
     if (error) throw error;
     return { success: true };
+  }
+
+  // Authentication methods
+  async signInWithPassword(email: string, password: string) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+    return data;
+  }
+
+  async signUpWithPassword(email: string, password: string, userData?: any) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: userData,
+      },
+    });
+
+    if (error) throw error;
+    return data;
+  }
+
+  async signOut() {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
+    const { error } = await this.supabase.auth.signOut();
+    if (error) throw error;
+    return { success: true };
+  }
+
+  async getCurrentUser() {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
+    const { data: { user }, error } = await this.supabase.auth.getUser();
+    if (error) throw error;
+    return user;
+  }
+
+  async refreshSession(refreshToken: string) {
+    if (!this.supabase) {
+      throw new Error('Supabase client is not initialized');
+    }
+    
+    const { data, error } = await this.supabase.auth.refreshSession({
+      refresh_token: refreshToken,
+    });
+
+    if (error) throw error;
+    return data;
   }
 }
