@@ -88,10 +88,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email, 'User:', session?.user ? 'exists' : 'none')
-        setSession(session)
-        setUser(session?.user ?? null)
-        setLoading(false)
-        setError(null) // Clear any previous errors
+
+        // Handle different auth events
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+          setSession(session)
+          setUser(session?.user ?? null)
+          setLoading(false)
+          setError(null)
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null)
+          setUser(null)
+          setLoading(false)
+          setError(null)
+        }
       }
     )
 
@@ -131,9 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: userData
-        }
+        options: { data: userData }
       })
 
       if (error) throw error

@@ -77,13 +77,7 @@ export default function Login() {
       } else if (data) {
         console.log('Login successful, checking user state...')
         // The redirect should happen via useEffect when user state updates
-        // But let's also try to redirect manually if needed
-        setTimeout(() => {
-          if (user) {
-            console.log('Manual redirect to dashboard...')
-            router.push('/dashboard');
-          }
-        }, 100);
+        // No need for manual redirect or setTimeout
       }
     } catch (error: any) {
       console.error('Unexpected login error:', error)
