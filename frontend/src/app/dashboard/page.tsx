@@ -17,9 +17,66 @@ export default function Dashboard() {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
+  // Helper function to get user name from different data structures
+  const getUserName = (user: any) => {
+    if (!user) return 'User';
+    
+    // Try different possible locations for user data
+    if (user.user_metadata?.first_name && user.user_metadata?.last_name) {
+      return `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
+    }
+    
+    if (user.user_metadata?.first_name) {
+      return user.user_metadata.first_name;
+    }
+    
+    // Check for custom properties that might exist
+    if ((user as any).firstName && (user as any).lastName) {
+      return `${(user as any).firstName} ${(user as any).lastName}`;
+    }
+    
+    if ((user as any).firstName) {
+      return (user as any).firstName;
+    }
+    
+    if (user.email) {
+      return user.email.split('@')[0]; // Use email prefix as fallback
+    }
+    
+    return 'User';
+  };
+
+  // Check if user has minimal required data
+  const hasMinimalUserData = (user: any) => {
+    return user && (user.id || user.email);
+  };
+
+  // Helper function to get user metadata safely
+  const getUserMetadata = (user: any, key: string, fallback: string = 'Not specified') => {
+    if (!user) return fallback;
+    
+    // Try different possible locations
+    if (user.user_metadata?.[key]) return user.user_metadata[key];
+    if ((user as any)[key]) return (user as any)[key];
+    
+    return fallback;
+  };
+
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
+    }
+    
+    // Debug: Log user data when it changes
+    if (user) {
+      console.log('Dashboard: User data received:', {
+        id: user.id,
+        email: user.email,
+        user_metadata: user.user_metadata,
+        firstName: (user as any).firstName,
+        lastName: (user as any).lastName,
+        fullUser: user
+      });
     }
   }, [user, loading, router]);
 
@@ -38,13 +95,56 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Authenticating...</p>
+        </div>
       </div>
     );
   }
 
   if (!user) {
-    return null; // Will redirect via useEffect
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading user data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has minimal required data
+  if (!hasMinimalUserData(user)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Issue</h2>
+          <p className="text-gray-600 mb-4">
+            We're having trouble loading your user data. This might be due to an incomplete authentication session.
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Go to Login
+            </button>
+            <button
+              onClick={() => window.location.href = '/test-auth'}
+              className="w-full px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            >
+              Debug Authentication
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -68,7 +168,7 @@ export default function Dashboard() {
                   <UserIcon className="h-5 w-5 text-blue-600" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">
-                  {user.user_metadata?.first_name} {user.user_metadata?.last_name}
+                  {getUserName(user)}
                 </span>
               </div>
               
@@ -92,7 +192,7 @@ export default function Dashboard() {
           <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
             <div className="px-4 py-5 sm:p-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Welcome back, {user.user_metadata?.first_name || 'User'}!
+                Welcome back, {getUserName(user)}!
               </h1>
               <p className="text-gray-600">
                 You have successfully signed in to your AutoHR dashboard.
@@ -114,7 +214,7 @@ export default function Dashboard() {
                         Full Name
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {user.user_metadata?.first_name} {user.user_metadata?.last_name}
+                        {getUserName(user)}
                       </dd>
                     </dl>
                   </div>
@@ -154,7 +254,7 @@ export default function Dashboard() {
                         Company
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {user.user_metadata?.company || 'Not specified'}
+                        {getUserMetadata(user, 'company')}
                       </dd>
                     </dl>
                   </div>
@@ -174,7 +274,7 @@ export default function Dashboard() {
                         Job Title
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {user.user_metadata?.job_title || 'Not specified'}
+                        {getUserMetadata(user, 'job_title')}
                       </dd>
                     </dl>
                   </div>
