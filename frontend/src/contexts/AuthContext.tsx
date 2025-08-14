@@ -14,7 +14,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ data: unknown; error: Error | null }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ data: unknown; error: Error | null }>
-  signInWithProvider: (provider: 'google' | 'linkedin') => Promise<{ data: unknown; error: Error | null }>
+  signInWithProvider: (provider: 'google') => Promise<{ data: unknown; error: Error | null }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -219,23 +219,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const signInWithProvider = async (provider: 'google' | 'linkedin') => {
+  const signInWithProvider = async (provider: 'google') => {
     try {
-      let supabaseProvider: string;
-      
-      switch (provider) {
-        case 'google':
-          supabaseProvider = 'google';
-          break;
-        case 'linkedin':
-          supabaseProvider = 'linkedin';
-          break;
-        default:
-          throw new Error('Unsupported provider');
-      }
-
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: supabaseProvider as any,
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`
         }
