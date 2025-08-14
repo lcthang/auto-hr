@@ -41,7 +41,7 @@ export async function middleware(req: NextRequest) {
 
   // Protected routes that require authentication
   const protectedRoutes = ['/dashboard', '/profile', '/settings']
-  const authRoutes = ['/login', '/signup', '/register']
+  const authRoutes = ['/login', '/register']
   
   const isProtectedRoute = protectedRoutes.some(route => 
     req.nextUrl.pathname.startsWith(route)
