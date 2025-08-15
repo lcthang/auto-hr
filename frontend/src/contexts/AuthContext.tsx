@@ -14,6 +14,9 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ data: unknown; error: Error | null }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ data: unknown; error: Error | null }>
+  updatePassword: (password: string) => Promise<{ data: unknown; error: Error | null }>
+  handlePasswordRecovery: (accessToken: string, refreshToken: string) => Promise<{ data: unknown; error: Error | null }>
+  refreshSession: () => Promise<{ data: unknown; error: Error | null }>
   signInWithProvider: (provider: 'google') => Promise<{ data: unknown; error: Error | null }>
 }
 
@@ -208,11 +211,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetPassword = async (email: string) => {
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`
+        redirectTo: `${window.location.origin}/reset-password`
       })
 
       if (error) throw error
 
+      return { data, error: null }
+    } catch (error: unknown) {
+      return { data: null, error: error as Error }
+    }
+  }
+
+  const updatePassword = async (password: string) => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        password: password
+      })
+
+      if (error) throw error
+
+      return { data, error: null }
+    } catch (error: unknown) {
+      return { data: null, error: error as Error }
+    }
+  }
+
+  const handlePasswordRecovery = async (accessToken: string, refreshToken: string) => {
+    try {
+      // Set the session with the recovery tokens
+      const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      })
+
+      if (error) throw error
+
+      // Update local state
+      if (data.session) {
+        setSession(data.session)
+        setUser(data.user)
+      }
+
+      return { data, error: null }
+    } catch (error: unknown) {
+      return { data: null, error: error as Error }
+    }
+  }
+
+  const refreshSession = async () => {
+    try {
+      const { data, error } = await supabase.auth.refreshSession()
+      
+      if (error) throw error
+      
+      if (data.session) {
+        setSession(data.session)
+        setUser(data.user)
+      }
+      
       return { data, error: null }
     } catch (error: unknown) {
       return { data: null, error: error as Error }
@@ -245,6 +301,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signOut,
     resetPassword,
+    updatePassword,
+    handlePasswordRecovery,
+    refreshSession,
     signInWithProvider
   }
 
