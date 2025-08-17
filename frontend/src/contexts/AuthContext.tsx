@@ -115,7 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Use API gateway instead of direct Supabase insertion
       const profileData: CreateProfileData = {
         id: user.id,
-        email: user.email || '',
+        email: user.email as string,
         first_name: (userData.first_name as string) || '',
         last_name: (userData.last_name as string) || '',
         company: (userData.company as string) || '',
@@ -143,7 +143,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: userData }
+        options: {
+          data: userData,
+          emailRedirectTo: `${window.location.origin}/login`
+        }
       })
 
       if (error) throw error

@@ -23,7 +23,7 @@ export class AuthService {
     @Optional() private readonly supabaseService?: SupabaseService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<any> {
+  async register(registerDto: RegisterDto): Promise<LoginResponseDto> {
     return this.registerSupabase(registerDto)
   }
 
@@ -55,8 +55,8 @@ export class AuthService {
         expiresIn,
         user: {
           id: extractUserId(user),
-          firstName: user.firstName,
-          lastName: user.lastName,
+          firstName: user.first_name,
+          lastName: user.last_name,
           email: user.email,
           phoneNumber: user.phoneNumber,
           createdAt: user.createdAt,
@@ -141,7 +141,7 @@ export class AuthService {
   }
 
   // Supabase specific methods
-  private async registerSupabase(registerDto: RegisterDto): Promise<any> {
+  private async registerSupabase(registerDto: RegisterDto): Promise<LoginResponseDto> {
     if (!this.supabaseService) {
       throw new Error('Supabase service is not available');
     }
@@ -199,8 +199,8 @@ export class AuthService {
       expiresIn,
       user: {
         id: extractUserId(user),
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.first_name,
+        lastName: user.last_name,
         email: user.email,
         phoneNumber: user.phoneNumber,
         createdAt: user.createdAt,

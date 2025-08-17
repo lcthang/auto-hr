@@ -49,7 +49,7 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'User registered successfully',
-    type: RegisterDto,
+    type: LoginResponseDto,
   })
   @ApiResponse({
     status: 400,
