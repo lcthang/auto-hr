@@ -120,7 +120,7 @@ export class SupabaseService {
     return data;
   }
 
-  async signUpWithPassword(email: string, password: string, userData?: any) {
+  async signUp(email: string, password: string, userData?: any) {
     if (!this.supabase) {
       throw new Error('Supabase client is not initialized');
     }

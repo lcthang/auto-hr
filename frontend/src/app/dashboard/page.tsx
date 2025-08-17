@@ -16,18 +16,23 @@ export default function Dashboard() {
   const { user, signOut, loading } = useAuth();
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  
+  // State for editable fields
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState({
+    firstName: '',
+    lastName: '',
+    company: '',
+    jobTitle: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   // Helper function to get user name from different data structures
   const getUserName = (user: any) => {
     if (!user) return 'User';
-    
-    // Try different possible locations for user data
+
     if (user.user_metadata?.first_name && user.user_metadata?.last_name) {
       return `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
-    }
-    
-    if (user.user_metadata?.first_name) {
-      return user.user_metadata.first_name;
     }
     
     // Check for custom properties that might exist
@@ -35,14 +40,10 @@ export default function Dashboard() {
       return `${(user as any).firstName} ${(user as any).lastName}`;
     }
     
-    if ((user as any).firstName) {
-      return (user as any).firstName;
-    }
-    
     if (user.email) {
       return user.email.split('@')[0]; // Use email prefix as fallback
     }
-    
+
     return 'User';
   };
 
@@ -77,8 +78,60 @@ export default function Dashboard() {
         lastName: (user as any).lastName,
         fullUser: user
       });
+      
+      // Initialize edit values with current user data
+      setEditValues({
+        firstName: getUserMetadata(user, 'first_name', ''),
+        lastName: getUserMetadata(user, 'last_name', ''),
+        company: getUserMetadata(user, 'company'),
+        jobTitle: getUserMetadata(user, 'job_title')
+      });
     }
   }, [user, loading, router]);
+
+  // Handle edit mode for fields
+  const handleEdit = (field: string) => {
+    setEditingField(field);
+    // Set initial values based on current user data
+    if (field === 'firstName') {
+      setEditValues(prev => ({ ...prev, firstName: getUserMetadata(user, 'first_name', '') }));
+    } else if (field === 'lastName') {
+      setEditValues(prev => ({ ...prev, lastName: getUserMetadata(user, 'last_name', '') }));
+    } else if (field === 'company') {
+      setEditValues(prev => ({ ...prev, company: getUserMetadata(user, 'company') }));
+    } else if (field === 'jobTitle') {
+      setEditValues(prev => ({ ...prev, jobTitle: getUserMetadata(user, 'jobTitle') }));
+    }
+  };
+
+  // Handle save for fields
+  const handleSave = async (field: string) => {
+    setIsSaving(true);
+    try {
+      // Here you would typically make an API call to update the user data
+      // For now, we'll just simulate the update
+      console.log(`Saving ${field}:`, editValues[field as keyof typeof editValues]);
+      
+      // TODO: Implement actual API call to update user metadata
+      // await updateUserMetadata(field, editValues[field as keyof typeof editValues]);
+      
+      // Exit edit mode
+      setEditingField(null);
+      
+      // Show success message (you could add a toast notification here)
+      console.log(`${field} updated successfully`);
+    } catch (error) {
+      console.error(`Error updating ${field}:`, error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle cancel edit
+  const handleCancel = () => {
+    setEditingField(null);
+          setEditValues({ firstName: '', lastName: '', company: '', jobTitle: '' });
+  };
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -211,10 +264,100 @@ export default function Dashboard() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        Full Name
+                        First Name
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {getUserName(user)}
+                        {editingField === 'firstName' ? (
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={editValues.firstName}
+                              onChange={(e) => setEditValues(prev => ({ ...prev, firstName: e.target.value }))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Enter first name"
+                            />
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleSave('firstName')}
+                                disabled={isSaving}
+                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                              >
+                                {isSaving ? 'Saving...' : 'Save'}
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="px-3 py-1 text-sm bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <span>{getUserMetadata(user, 'first_name', 'Not specified')}</span>
+                            <button
+                              onClick={() => handleEdit('firstName')}
+                              className="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        )}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <UserIcon className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Last Name
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        {editingField === 'lastName' ? (
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={editValues.lastName}
+                              onChange={(e) => setEditValues(prev => ({ ...prev, lastName: e.target.value }))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Enter last name"
+                            />
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleSave('lastName')}
+                                disabled={isSaving}
+                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                              >
+                                {isSaving ? 'Saving...' : 'Save'}
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="px-3 py-1 text-sm bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <span>{getUserMetadata(user, 'last_name', 'Not specified')}</span>
+                            <button
+                              onClick={() => handleEdit('lastName')}
+                              className="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        )}
                       </dd>
                     </dl>
                   </div>
@@ -254,7 +397,42 @@ export default function Dashboard() {
                         Company
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {getUserMetadata(user, 'company')}
+                        {editingField === 'company' ? (
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={editValues.company}
+                              onChange={(e) => setEditValues(prev => ({ ...prev, company: e.target.value }))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Enter company name"
+                            />
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleSave('company')}
+                                disabled={isSaving}
+                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                              >
+                                {isSaving ? 'Saving...' : 'Save'}
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="px-3 py-1 text-sm bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <span>{getUserMetadata(user, 'company')}</span>
+                            <button
+                              onClick={() => handleEdit('company')}
+                              className="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        )}
                       </dd>
                     </dl>
                   </div>
@@ -274,34 +452,41 @@ export default function Dashboard() {
                         Job Title
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {getUserMetadata(user, 'job_title')}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Cog6ToothIcon className="h-6 w-6 text-gray-400" />
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Account Status
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {user.email_confirmed_at ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Verified
-                          </span>
+                        {editingField === 'jobTitle' ? (
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={editValues.jobTitle}
+                              onChange={(e) => setEditValues(prev => ({ ...prev, jobTitle: e.target.value }))}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Enter job title"
+                            />
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleSave('jobTitle')}
+                                disabled={isSaving}
+                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                              >
+                                {isSaving ? 'Saving...' : 'Save'}
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="px-3 py-1 text-sm bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            Pending Verification
-                          </span>
+                          <div className="flex items-center justify-between">
+                            <span>{getUserMetadata(user, 'job_title')}</span>
+                            <button
+                              onClick={() => handleEdit('jobTitle')}
+                              className="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                              Edit
+                            </button>
+                          </div>
                         )}
                       </dd>
                     </dl>
@@ -309,6 +494,8 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+
+
           </div>
 
           {/* Quick Actions */}
