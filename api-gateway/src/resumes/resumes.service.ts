@@ -58,7 +58,7 @@ export class ResumesService {
 
   private async extractTextFromPDF(buffer: Buffer): Promise<string> {
     try {
-      // Call FastAPI LLM service for PDF text extraction
+      // Call LLM service for PDF text extraction
       const response = await firstValueFrom(
         this.httpService.post('http://localhost:8000/extract-pdf-text', {
           pdf_data: buffer.toString('base64'),
@@ -74,7 +74,7 @@ export class ResumesService {
 
   private async extractMetadata(content: string): Promise<ResumeMetadata> {
     try {
-      // Call FastAPI LLM service for metadata extraction
+      // Call LLM service for metadata extraction
       const response = await firstValueFrom(
         this.httpService.post('http://localhost:8000/extract-metadata', {
           content,

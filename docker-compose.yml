@@ -9,7 +9,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://api-gateway:3001
+      - API_GATEWAY_URL=${API_GATEWAY_URL}
+      - LLM_SERVICE_URL=${LLM_SERVICE_URL}
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
     depends_on:
@@ -18,7 +19,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
 
-  # API Gateway (Nest.js)
+  # API Gateway
   api-gateway:
     build:
       context: ./api-gateway
@@ -26,26 +27,26 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - LLM_SERVICE_URL=http://fastapi-llm:8000
+      - LLM_SERVICE_URL=http://llm-service:8000
       - MONGODB_URI=mongodb://mongodb:27017
     depends_on:
-      - fastapi-llm
+      - llm-service
       - mongodb
     volumes:
       - ./api-gateway:/app
       - /app/node_modules
 
-  # FastAPI LLM Service
-  fastapi-llm:
+  # LLM Service
+  llm-service:
     build:
-      context: ./fastapi-llm
+      context: ./llm-service
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
-      - ./fastapi-llm:/app
+      - ./llm-service:/app
 
   # MongoDB
   mongodb:
