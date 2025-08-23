@@ -72,8 +72,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setError(`Session error: ${error.message}`)
         } else {
           console.log('Initial session:', session ? 'exists' : 'none', session?.user?.email)
-          console.log('Session data:', session)
-          console.log('User data:', session?.user)
           setSession(session)
           setUser(session?.user ?? null)
         }
@@ -183,8 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Sign in successful:', data.user?.email)
-      console.log('Session data:', data.session ? 'exists' : 'none')
-      
+            
       // Immediately update local state
       if (data.session) {
         setSession(data.session)
