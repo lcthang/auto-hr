@@ -9,7 +9,8 @@ import {
   BriefcaseIcon, 
   EnvelopeIcon,
   ArrowRightOnRectangleIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 
 export default function Dashboard() {
@@ -537,9 +538,28 @@ export default function Dashboard() {
                   </div>
                 </button>
 
-                <button className="relative group bg-gray-50 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg hover:bg-gray-100">
+                <button 
+                  onClick={() => router.push('/jd-generator')}
+                  className="relative group bg-gray-50 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg hover:bg-gray-100"
+                >
                   <div>
                     <span className="rounded-lg inline-flex p-3 bg-purple-50 text-purple-600 ring-4 ring-white">
+                      <DocumentTextIcon className="h-6 w-6" />
+                    </span>
+                  </div>
+                  <div className="mt-8">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      JD Generator
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-500">
+                      Create professional job descriptions with AI assistance.
+                    </p>
+                  </div>
+                </button>
+
+                <button className="relative group bg-gray-50 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg hover:bg-gray-100">
+                  <div>
+                    <span className="rounded-lg inline-flex p-3 bg-gray-50 text-gray-600 ring-4 ring-white">
                       <Cog6ToothIcon className="h-6 w-6" />
                     </span>
                   </div>
