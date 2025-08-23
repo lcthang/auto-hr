@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
-import { apiService, CreateProfileData } from '@/lib/api'
+import { apiGatewayService, CreateProfileData } from '@/lib/api'
 
 interface AuthContextType {
   user: User | null
@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         is_active: true
       };
 
-      const response = await apiService.registerUser(profileData);
+      const response = await apiGatewayService.registerUser(profileData);
 
       if (!response.success) {
         console.error('Error creating user profile:', response.error);
