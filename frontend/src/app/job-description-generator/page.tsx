@@ -101,17 +101,7 @@ export default function JDGenerator() {
     }
   };
 
-  const downloadAsMarkdown = () => {
-    const blob = new Blob([generatedJD], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${form.job_title.replace(/\s+/g, '_')}_Job_Description.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+  
 
   if (loading) {
     return (
@@ -177,7 +167,7 @@ export default function JDGenerator() {
             <div className="lg:col-span-1">
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
                     Job Details
                   </h3>
 
@@ -305,7 +295,7 @@ export default function JDGenerator() {
             <div className="lg:col-span-1">
               <div className="bg-white shadow rounded-lg sticky top-6">
                 <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
                     Preview
                   </h3>
                   
@@ -314,7 +304,12 @@ export default function JDGenerator() {
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <div className="prose prose-sm max-w-none">
                           <div dangerouslySetInnerHTML={{ 
-                            __html: generatedJD.replace(/\n/g, '<br>').replace(/# (.*)/g, '<h1 class="text-xl font-bold text-gray-900">$1</h1>').replace(/## (.*)/g, '<h2 class="text-lg font-semibold text-gray-800 mt-4">$1</h2>').replace(/• (.*)/g, '<li class="ml-4">$1</li>')
+                            __html: generatedJD
+                              .replace(/\*\*(.+?)\*\*/g, '<strong>$1<\/strong>')
+                              .replace(/\n/g, '<br>')
+                              .replace(/# (.*)/g, '<h1 class="text-xl font-bold text-gray-900">$1<\/h1>')
+                              .replace(/## (.*)/g, '<h2 class="text-lg font-semibold text-gray-800 mt-4">$1<\/h2>')
+                              .replace(/• (.*)/g, '<li class="ml-4">$1<\/li>')
                           }} />
                         </div>
                       </div>
@@ -322,17 +317,10 @@ export default function JDGenerator() {
                       <div className="flex space-x-2">
                         <button
                           onClick={copyToClipboard}
-                          className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
+                          className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
                         >
                           <ClipboardDocumentIcon className="h-4 w-4 mr-2" />
                           Copy
-                        </button>
-                        <button
-                          onClick={downloadAsMarkdown}
-                          className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
-                        >
-                          <DocumentTextIcon className="h-4 w-4 mr-2" />
-                          Download
                         </button>
                       </div>
                     </div>
