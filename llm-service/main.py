@@ -1,10 +1,14 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
+import requests
 import base64
 from typing import Optional, Dict, Any
 import re
+import os
+from dotenv import load_dotenv
+import logging
 from datetime import datetime
 
 app = FastAPI(
@@ -21,6 +25,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Set your Groq API key (from https://console.groq.com/)
+load_dotenv()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+MODEL_NAME = "llama-3.1-8b-instant"  # Fast, good quality model
+
+# Logging
+logging.basicConfig(level=logging.INFO)
 
 class LLMRequest(BaseModel):
     prompt: str
@@ -84,18 +97,12 @@ vectors_db = []
 async def root():
     return {"message": "Auto-HR LLM Service is running"}
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "llm"}
-
 @app.post("/generate", response_model=LLMResponse)
 async def generate_response(request: LLMRequest):
     """
     Generate LLM response based on the provided prompt
     """
     try:
-        # TODO: Implement actual LLM integration
-        # This is a placeholder response
         response = f"Generated response for: {request.prompt}"
         
         return LLMResponse(
@@ -233,56 +240,35 @@ async def store_vector(request: VectorStoreRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to store vector: {str(e)}")
 
-@app.post("/generate-jd", response_model=JDGeneratorResponse)
+@app.post("/generate-job-description", response_model=JDGeneratorResponse)
 async def generate_job_description(request: JDGeneratorRequest):
-    """
-    Generate a comprehensive job description based on provided parameters
-    """
     try:
-        # Build the prompt for JD generation
+        # Build the LLM prompt
         prompt = f"""
-        Generate a professional job description for the following position:
+        Write a {request.tone} job description for the position of {request.job_title}
+        at {request.company_name}, located in {request.location}.
         
-        Job Title: {request.job_title}
-        Company: {request.company_name}
-        Location: {request.location or 'Not specified'}
-        Tone: {request.tone}
-        Job Details: {request.job_details or 'Not provided'}
+        Additional job details to include: {request.job_details}.
         
-        Please generate a comprehensive, professional job description that includes:
-        1. A compelling job summary
-        2. Detailed responsibilities
-        3. Required and preferred qualifications
-        4. Benefits and company information
-        5. Application instructions
-        
-        Make it engaging and professional while being specific to the role and company.
+        Format the job description with clear sections:
+        1. Overview
+        2. Responsibilities
+        3. Requirements
+        4. Benefits
         """
+        
+        # Prepare GROQ API request
+        headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
+        data = {
+            "model": MODEL_NAME,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7,
+            "max_tokens": 600
+        }
 
-        job_description = f"""
-# {request.job_title}
-
-## About {request.company_name}
-{request.company_name} is a dynamic organization seeking talented professionals to join our team.
-
-## Position Overview
-We are seeking a qualified {request.job_title} to join our team in {request.location or 'our organization'}. This position offers an exciting opportunity to contribute to our company's success and growth.
-
-## Job Details
-{request.job_details or 'Not provided'}
-
-## Benefits
-• Competitive salary and benefits package
-• Professional development opportunities
-• Collaborative and inclusive work environment
-• Health, dental, and vision insurance
-• Paid time off and holidays
-
-## How to Apply
-Interested candidates should submit their resume and cover letter through our application portal. We look forward to hearing from qualified applicants who are excited about this opportunity.
-
-{request.company_name} is an equal opportunity employer committed to diversity and inclusion in the workplace.
-        """
+        response = requests.post(GROQ_URL, headers=headers, json=data)
+        result = response.json()
+        job_description = result["choices"][0]["message"]["content"]
         
         return JDGeneratorResponse(
             job_description=job_description.strip(),
