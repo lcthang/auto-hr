@@ -539,7 +539,7 @@ export default function Dashboard() {
                 </button>
 
                 <button 
-                  onClick={() => router.push('/jd-generator')}
+                  onClick={() => router.push('/job-description-generator')}
                   className="relative group bg-gray-50 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg hover:bg-gray-100"
                 >
                   <div>

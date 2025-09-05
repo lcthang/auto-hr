@@ -150,7 +150,7 @@ class LLMService {
 
   // Job Description Generation
   async generateJobDescription(data: JDGeneratorRequest): Promise<JDGeneratorResponse> {
-    return this.request<JDGeneratorResponse>('/generate-jd', {
+    return this.request<JDGeneratorResponse>('/generate-job-description', {
       method: 'POST',
       body: JSON.stringify(data),
     });
