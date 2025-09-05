@@ -179,7 +179,7 @@ export default function Login() {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
+                Email Address
               </label>
               <input
                 type="email"
